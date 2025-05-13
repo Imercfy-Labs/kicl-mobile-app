@@ -1,225 +1,153 @@
-import React from 'react';
-import { View, ScrollView, Text, StyleSheet } from 'react-native';
-import GradientBackground from '@/components/GradientBackground';
-import MetricCard from '@/components/MetricCard';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
+import { Menu, Bell, User } from 'lucide-react-native';
+import Logo from '@/components/Logo';
 
 export default function DashboardScreen() {
   const { user } = useAuth();
-  
+  const [isPunchedIn, setIsPunchedIn] = useState(false);
+  const lastInTime = "10:12 Am";
+  const lastOutTime = "6:40 Pm";
+
+  const togglePunchStatus = () => {
+    setIsPunchedIn(!isPunchedIn);
+  };
+
+  const ProgressCard = ({ title, value, unit = '' }) => (
+    <View style={styles.progressCard}>
+      <Text style={styles.progressTitle}>{title}</Text>
+      <Text style={styles.progressValue}>{value}{unit}</Text>
+    </View>
+  );
+
   return (
-    <GradientBackground>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.greeting}>Welcome back,</Text>
-          <Text style={styles.name}>{user?.name}</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity>
+          <Menu size={24} color="#000" />
+        </TouchableOpacity>
+        <Logo size="small" showText={false} />
+        <View style={styles.headerIcons}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Bell size={24} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <User size={24} color="#000" />
+          </TouchableOpacity>
         </View>
-        
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Monthly Performance</Text>
-          <View style={styles.cardsRow}>
-            <MetricCard 
-              title="Target (monthly)" 
-              value="89%" 
-              style={{ flex: 1 }}
-            />
-            <MetricCard 
-              title="Orders Value" 
-              value="₹150,000" 
-              subtitle="this month" 
-              style={{ flex: 1 }}
-            />
-          </View>
-          
-          <View style={styles.cardsRow}>
-            <MetricCard 
-              title="Active Dealers" 
-              value="27" 
-              subtitle="out of 35" 
-              style={{ flex: 1 }}
-            />
-            <MetricCard 
-              title="Hours Worked" 
-              value="125" 
-              subtitle="this month" 
-              style={{ flex: 1 }}
-            />
-          </View>
-        </View>
-        
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.quickActions}>
-            <View style={styles.quickActionItem}>
-              <View style={styles.quickActionIcon}>
-                <Text style={styles.quickActionIconText}>+</Text>
-              </View>
-              <Text style={styles.quickActionText}>New Order</Text>
-            </View>
-            
-            <View style={styles.quickActionItem}>
-              <View style={styles.quickActionIcon}>
-                <Text style={styles.quickActionIconText}>↑</Text>
-              </View>
-              <Text style={styles.quickActionText}>Upload Report</Text>
-            </View>
-            
-            <View style={styles.quickActionItem}>
-              <View style={styles.quickActionIcon}>
-                <Text style={styles.quickActionIconText}>👥</Text>
-              </View>
-              <Text style={styles.quickActionText}>Add Dealer</Text>
-            </View>
-            
-            <View style={styles.quickActionItem}>
-              <View style={styles.quickActionIcon}>
-                <Text style={styles.quickActionIconText}>📊</Text>
-              </View>
-              <Text style={styles.quickActionText}>View Analytics</Text>
-            </View>
-          </View>
-        </View>
-        
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
-          <View style={styles.activityList}>
-            <View style={styles.activityItem}>
-              <View style={styles.activityDot} />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>Order #TK3842 Delivered</Text>
-                <Text style={styles.activityTime}>2 hours ago</Text>
-              </View>
-            </View>
-            
-            <View style={styles.activityItem}>
-              <View style={styles.activityDot} />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>New dealer registered - Krishi Kendra</Text>
-                <Text style={styles.activityTime}>Yesterday, 2:30 PM</Text>
-              </View>
-            </View>
-            
-            <View style={styles.activityItem}>
-              <View style={styles.activityDot} />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>Monthly target updated</Text>
-                <Text style={styles.activityTime}>2 days ago</Text>
-              </View>
-            </View>
-            
-            <View style={styles.activityItem}>
-              <View style={styles.activityDot} />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>Field visit scheduled - Ambala region</Text>
-                <Text style={styles.activityTime}>3 days ago</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </GradientBackground>
+      </View>
+
+      <TouchableOpacity 
+        style={[styles.punchButton, isPunchedIn ? styles.punchOutButton : styles.punchInButton]}
+        onPress={togglePunchStatus}
+      >
+        <Text style={styles.punchButtonText}>
+          {isPunchedIn ? 'Punch Out' : 'Punch In'}
+        </Text>
+      </TouchableOpacity>
+
+      <View style={styles.timeInfo}>
+        <Text style={styles.timeText}>Last In Time: {lastInTime}</Text>
+        <Text style={styles.timeText}>Last Out Time: {lastOutTime}</Text>
+      </View>
+
+      <Text style={styles.sectionTitle}>My Progress:</Text>
+
+      <View style={styles.progressGrid}>
+        <ProgressCard title="No. of Dealers Visited" value="5" />
+        <ProgressCard title="Sales Target Progress (monthly)" value="63" unit="%" />
+        <ProgressCard title="Orders Placed Today" value="3" />
+        <ProgressCard title="Order Value Today" value="₹ 7000" />
+        <ProgressCard title="Field Activities this Week" value="2" />
+        <ProgressCard title="Hours Worked Today" value="5" />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 16,
-    paddingTop: 0,
+    backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
   },
   header: {
-    marginBottom: 24,
-    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 30,
   },
-  greeting: {
-    fontSize: 16,
-    color: '#333',
+  headerIcons: {
+    flexDirection: 'row',
   },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
+  iconButton: {
+    marginLeft: 15,
   },
-  section: {
-    marginBottom: 24,
+  punchButton: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  punchInButton: {
+    backgroundColor: '#8CC63F',
+  },
+  punchOutButton: {
+    backgroundColor: '#FF3B30',
+  },
+  punchButtonText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  timeInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 30,
+  },
+  timeText: {
+    color: '#666',
+    fontSize: 14,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 16,
-    color: '#000',
+    marginLeft: 20,
+    marginBottom: 15,
   },
-  cardsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  quickActions: {
+  progressGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    paddingHorizontal: 10,
   },
-  quickActionItem: {
-    width: '48%',
+  progressCard: {
+    width: '45%',
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
-    flexDirection: 'row',
+    borderRadius: 10,
+    padding: 15,
+    margin: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 3,
   },
-  quickActionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(61, 211, 158, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+  progressTitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 10,
   },
-  quickActionIconText: {
-    fontSize: 18,
+  progressValue: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#3DD39E',
-  },
-  quickActionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  activityList: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    elevation: 3,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    alignItems: 'flex-start',
-  },
-  activityDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#3DD39E',
-    marginTop: 6,
-    marginRight: 12,
-  },
-  activityContent: {
-    flex: 1,
-  },
-  activityTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 4,
-  },
-  activityTime: {
-    fontSize: 12,
-    color: '#888',
+    color: '#000',
   },
 });
