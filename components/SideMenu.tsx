@@ -1,29 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import Logo from './Logo';
-import { User, LayoutDashboard, Users, ClipboardList, Package, LogOut, Chrome as Home } from 'lucide-react-native';
-
-interface MenuItemProps {
-  icon: React.ReactNode;
-  title: string;
-  onPress: () => void;
-  isActive?: boolean;
-}
-
-function MenuItem({ icon, title, onPress, isActive = false }: MenuItemProps) {
-  return (
-    <TouchableOpacity 
-      style={[styles.menuItem, isActive && styles.activeMenuItem]} 
-      onPress={onPress}
-    >
-      <View style={styles.iconContainer}>
-        {icon}
-      </View>
-      <Text style={styles.menuText}>{title}</Text>
-    </TouchableOpacity>
-  );
-}
+import { LogOut } from 'lucide-react-native';
 
 interface SideMenuProps {
   activePath: string;
@@ -36,87 +14,137 @@ interface SideMenuProps {
 
 export default function SideMenu({ activePath, userInfo, onClose }: SideMenuProps) {
   const router = useRouter();
-  
-  const navigateTo = (path: string) => {
-    router.push(path);
-    onClose();
-  };
-  
-  const handleLogout = () => {
-    router.replace('/');
-  };
-  
+
+  const MenuItem = ({ title, isActive = false, isSubItem = false, onPress }) => (
+    <TouchableOpacity 
+      style={[
+        styles.menuItem,
+        isActive && styles.activeMenuItem,
+        isSubItem && styles.subMenuItem
+      ]} 
+      onPress={onPress}
+    >
+      <Text style={[
+        styles.menuText,
+        isActive && styles.activeMenuText,
+        isSubItem && styles.subMenuText
+      ]}>
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Logo showText={true} size="small" />
+        <Image
+          source={{ uri: 'https://images.pexels.com/photos/2123375/pexels-photo-2123375.jpeg' }}
+          style={styles.logo}
+        />
+        <Text style={styles.logoText}>TK TECH KOTHARI</Text>
+        <Text style={styles.subText}>A UNIT OF KOTHARI INDUSTRIAL CORPORATION LIMITED</Text>
       </View>
-      
+
       <View style={styles.userInfo}>
-        <View style={styles.userIcon}>
-          <User color="#555" size={24} />
-        </View>
-        <View>
-          <Text style={styles.userName}>{userInfo.name}</Text>
-          <Text style={styles.userDetail}>Employee ID: {userInfo.employeeId}</Text>
-        </View>
+        <Image
+          source={{ uri: 'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg' }}
+          style={styles.userAvatar}
+        />
+        <Text style={styles.userName}>{userInfo.name}</Text>
+        <Text style={styles.employeeId}>Employee ID: {userInfo.employeeId}</Text>
       </View>
-      
-      <ScrollView style={styles.menuContainer}>
+
+      <View style={styles.menuContainer}>
         <MenuItem 
-          icon={<LayoutDashboard color="#555" size={20} />} 
           title="Dashboard" 
-          onPress={() => navigateTo('/dashboard')}
           isActive={activePath === '/dashboard'}
+          onPress={() => router.push('/dashboard')}
         />
         <MenuItem 
-          icon={<Users color="#555" size={20} />} 
           title="Dealers" 
-          onPress={() => navigateTo('/dealers')}
           isActive={activePath === '/dealers'}
+          onPress={() => router.push('/dealers')}
         />
+        {activePath === '/dealers' && (
+          <>
+            <MenuItem 
+              title="Dealer Info" 
+              isSubItem 
+              isActive={activePath === '/dealers/info'}
+              onPress={() => router.push('/dealers/info')}
+            />
+            <MenuItem 
+              title="Payment" 
+              isSubItem
+              onPress={() => router.push('/dealers/payment')}
+            />
+            <MenuItem 
+              title="Dealer Outstanding" 
+              isSubItem
+              onPress={() => router.push('/dealers/outstanding')}
+            />
+            <MenuItem 
+              title="Dealer History" 
+              isSubItem
+              onPress={() => router.push('/dealers/history')}
+            />
+            <MenuItem 
+              title="Credit Note" 
+              isSubItem
+              onPress={() => router.push('/dealers/credit-note')}
+            />
+          </>
+        )}
         <MenuItem 
-          icon={<ClipboardList color="#555" size={20} />} 
           title="Orders" 
-          onPress={() => navigateTo('/orders')}
           isActive={activePath.includes('/orders')}
+          onPress={() => router.push('/orders')}
         />
-        <View style={styles.subMenu}>
-          <MenuItem 
-            icon={<ClipboardList color="#555" size={18} />} 
-            title="Place Order" 
-            onPress={() => navigateTo('/orders/place')}
-            isActive={activePath === '/orders/place'}
-          />
-          <MenuItem 
-            icon={<ClipboardList color="#555" size={18} />} 
-            title="My Orders" 
-            onPress={() => navigateTo('/orders/my-orders')}
-            isActive={activePath === '/orders/my-orders'}
-          />
-          <MenuItem 
-            icon={<ClipboardList color="#555" size={18} />} 
-            title="Track Order" 
-            onPress={() => navigateTo('/orders/track')}
-            isActive={activePath === '/orders/track'}
-          />
-        </View>
+        {activePath.includes('/orders') && (
+          <>
+            <MenuItem 
+              title="Place Order" 
+              isSubItem 
+              isActive={activePath === '/orders/place'}
+              onPress={() => router.push('/orders/place')}
+            />
+            <MenuItem 
+              title="My Orders" 
+              isSubItem
+              onPress={() => router.push('/orders/my-orders')}
+            />
+            <MenuItem 
+              title="Track Order" 
+              isSubItem
+              onPress={() => router.push('/orders/track')}
+            />
+          </>
+        )}
         <MenuItem 
-          icon={<Package color="#555" size={20} />} 
           title="Inventory" 
-          onPress={() => navigateTo('/inventory')}
           isActive={activePath === '/inventory'}
+          onPress={() => router.push('/inventory')}
         />
         <MenuItem 
-          icon={<Home color="#555" size={20} />} 
           title="Field Development" 
-          onPress={() => navigateTo('/field-development')}
           isActive={activePath === '/field-development'}
+          onPress={() => router.push('/field-development')}
         />
-      </ScrollView>
-      
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <LogOut color="#555" size={20} />
+        <MenuItem 
+          title="Settlement" 
+          isActive={activePath === '/settlement'}
+          onPress={() => router.push('/settlement')}
+        />
+      </View>
+
+      <TouchableOpacity 
+        style={styles.logoutButton}
+        onPress={() => {
+          router.replace('/');
+          onClose();
+        }}
+      >
+        <LogOut size={20} color="#000" />
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </View>
@@ -126,78 +154,88 @@ export default function SideMenu({ activePath, userInfo, onClose }: SideMenuProp
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
-    borderTopRightRadius: 20,
-    borderBottomRightRadius: 20,
-    overflow: 'hidden',
+    backgroundColor: '#E8F5E9',
   },
   header: {
-    paddingVertical: 16,
+    padding: 20,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#D1E7DD',
+  },
+  logo: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 10,
+  },
+  logoText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2E3192',
+    marginBottom: 4,
+  },
+  subText: {
+    fontSize: 8,
+    color: '#2E3192',
+    textAlign: 'center',
   },
   userInfo: {
-    flexDirection: 'row',
+    padding: 20,
     alignItems: 'center',
-    padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#D1E7DD',
   },
-  userIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#e0e0e0',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+  userAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 10,
   },
   userName: {
     fontSize: 16,
     fontWeight: '600',
+    marginBottom: 4,
   },
-  userDetail: {
+  employeeId: {
     fontSize: 12,
     color: '#666',
   },
   menuContainer: {
     flex: 1,
+    paddingTop: 10,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
   },
   activeMenuItem: {
-    backgroundColor: 'rgba(61, 211, 158, 0.1)',
-    borderLeftWidth: 4,
-    borderLeftColor: '#3DD39E',
+    backgroundColor: '#3DD39E',
   },
-  iconContainer: {
-    width: 30,
-    alignItems: 'center',
-    marginRight: 12,
+  subMenuItem: {
+    paddingLeft: 40,
   },
   menuText: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#333',
   },
-  subMenu: {
-    paddingLeft: 16,
-    backgroundColor: 'rgba(0,0,0,0.02)',
+  activeMenuText: {
+    color: '#fff',
+    fontWeight: '500',
+  },
+  subMenuText: {
+    fontSize: 14,
+    color: '#666',
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#D1E7DD',
   },
   logoutText: {
     marginLeft: 12,
-    fontSize: 15,
+    fontSize: 16,
     color: '#333',
   },
 });
