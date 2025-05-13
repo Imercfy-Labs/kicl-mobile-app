@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 
 interface LogoProps {
   showText?: boolean;
@@ -11,11 +11,19 @@ export default function Logo({ showText = true, size = 'medium' }: LogoProps) {
   
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: 'https://images.pexels.com/photos/2123375/pexels-photo-2123375.jpeg' }}
-        style={[styles.logo, { width: logoSize, height: logoSize }]}
-        resizeMode="contain"
-      />
+      <View style={[styles.logoContainer, { width: logoSize, height: logoSize }]}>
+        <Image 
+          source={{ uri: 'https://images.pexels.com/photos/2123375/pexels-photo-2123375.jpeg' }}
+          style={[styles.logo, { width: logoSize * 0.7, height: logoSize * 0.7 }]}
+          resizeMode="contain"
+        />
+      </View>
+      {showText && (
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>TK TECH KOTHARI</Text>
+          <Text style={styles.subtitle}>A UNIT OF KOTHARI INDUSTRIAL CORPORATION LIMITED</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -23,9 +31,29 @@ export default function Logo({ showText = true, size = 'medium' }: LogoProps) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+  },
+  logoContainer: {
+    backgroundColor: '#2E3192',
+    borderRadius: 100,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   logo: {
-    tintColor: '#2E3192',
+    tintColor: '#FFFFFF',
+  },
+  textContainer: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2E3192',
+  },
+  subtitle: {
+    fontSize: 8,
+    color: '#2E3192',
+    textAlign: 'center',
+    marginTop: 2,
   },
 });

@@ -14,10 +14,10 @@ export default function DashboardScreen() {
     setIsPunchedIn(!isPunchedIn);
   };
 
-  const ProgressCard = ({ title, value, unit = '' }) => (
+  const ProgressCard = ({ title, value }) => (
     <View style={styles.progressCard}>
       <Text style={styles.progressTitle}>{title}</Text>
-      <Text style={styles.progressValue}>{value}{unit}</Text>
+      <Text style={styles.progressValue}>{value}</Text>
     </View>
   );
 
@@ -38,29 +38,49 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      <TouchableOpacity 
-        style={[styles.punchButton, isPunchedIn ? styles.punchOutButton : styles.punchInButton]}
-        onPress={togglePunchStatus}
-      >
-        <Text style={styles.punchButtonText}>
-          {isPunchedIn ? 'Punch Out' : 'Punch In'}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.content}>
+        <TouchableOpacity 
+          style={[styles.punchButton, isPunchedIn ? styles.punchOutButton : styles.punchInButton]}
+          onPress={togglePunchStatus}
+        >
+          <Text style={styles.punchButtonText}>
+            {isPunchedIn ? 'Punch Out' : 'Punch In'}
+          </Text>
+        </TouchableOpacity>
 
-      <View style={styles.timeInfo}>
-        <Text style={styles.timeText}>Last In Time: {lastInTime}</Text>
-        <Text style={styles.timeText}>Last Out Time: {lastOutTime}</Text>
-      </View>
+        <View style={styles.timeInfo}>
+          <Text style={styles.timeText}>Last In Time: {lastInTime}</Text>
+          <Text style={styles.timeText}>Last Out Time: {lastOutTime}</Text>
+        </View>
 
-      <Text style={styles.sectionTitle}>My Progress:</Text>
+        <Text style={styles.sectionTitle}>My Progress:</Text>
 
-      <View style={styles.progressGrid}>
-        <ProgressCard title="No. of Dealers Visited" value="5" />
-        <ProgressCard title="Sales Target Progress (monthly)" value="63" unit="%" />
-        <ProgressCard title="Orders Placed Today" value="3" />
-        <ProgressCard title="Order Value Today" value="₹ 7000" />
-        <ProgressCard title="Field Activities this Week" value="2" />
-        <ProgressCard title="Hours Worked Today" value="5" />
+        <View style={styles.progressGrid}>
+          <ProgressCard 
+            title="No. of Dealers Visited" 
+            value="5"
+          />
+          <ProgressCard 
+            title="Sales Target Progress (monthly)" 
+            value="63%"
+          />
+          <ProgressCard 
+            title="Orders Placed Today" 
+            value="3"
+          />
+          <ProgressCard 
+            title="Order Value Today" 
+            value="₹ 7000"
+          />
+          <ProgressCard 
+            title="Field Activities this Week" 
+            value="2"
+          />
+          <ProgressCard 
+            title="Hours Worked Today" 
+            value="5"
+          />
+        </View>
       </View>
     </View>
   );
@@ -70,29 +90,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'ios' ? 50 : 30,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginBottom: 30,
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingBottom: 20,
+    backgroundColor: '#E8F5E9',
   },
   headerIcons: {
     flexDirection: 'row',
+    alignItems: 'center',
   },
   iconButton: {
-    marginLeft: 15,
+    marginLeft: 20,
+  },
+  content: {
+    flex: 1,
+    padding: 20,
   },
   punchButton: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: 20,
+    marginVertical: 20,
   },
   punchInButton: {
     backgroundColor: '#8CC63F',
@@ -102,12 +128,12 @@ const styles = StyleSheet.create({
   },
   punchButtonText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '600',
   },
   timeInfo: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     marginBottom: 30,
   },
   timeText: {
@@ -117,20 +143,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginLeft: 20,
-    marginBottom: 15,
+    marginBottom: 20,
   },
   progressGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 10,
+    justifyContent: 'space-between',
   },
   progressCard: {
-    width: '45%',
+    width: '48%',
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 15,
-    margin: 10,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
