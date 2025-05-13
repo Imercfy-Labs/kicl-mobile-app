@@ -3,12 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { useAuth } from '../auth/AuthContext';
 import { Menu, Bell, User } from 'lucide-react-native';
 import Logo from '@/components/Logo';
+import { DrawerContext } from './_layout';
 
 export default function DashboardScreen() {
   const { user } = useAuth();
   const [isPunchedIn, setIsPunchedIn] = useState(false);
   const lastInTime = "10:12 Am";
   const lastOutTime = "6:40 Pm";
+  const { toggleDrawer } = React.useContext(DrawerContext);
 
   const togglePunchStatus = () => {
     setIsPunchedIn(!isPunchedIn);
@@ -24,7 +26,7 @@ export default function DashboardScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={toggleDrawer}>
           <Menu size={24} color="#000" />
         </TouchableOpacity>
         <Logo size="small" showText={false} />
