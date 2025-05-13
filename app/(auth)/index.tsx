@@ -1,163 +1,117 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import GradientBackground from '@/components/GradientBackground';
-import FormInput from '@/components/FormInput';
-import Button from '@/components/Button';
-import Logo from '@/components/Logo';
 import { useAuth } from '../auth/AuthContext';
 
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  
   const router = useRouter();
   const { login, isLoading } = useAuth();
-  
-  const validate = () => {
-    Keyboard.dismiss();
-    let isValid = true;
-    const newErrors: { email?: string; password?: string } = {};
-    
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-      isValid = false;
-    } else if (!EMAIL_REGEX.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
-      isValid = false;
-    }
-    
-    if (!password) {
-      newErrors.password = 'Password is required';
-      isValid = false;
-    }
-    
-    setErrors(newErrors);
-    return isValid;
-  };
-  
+
   const handleLogin = async () => {
-    if (validate()) {
-      try {
-        await login(email, password);
-        router.replace('/(tabs)/');
-      } catch (error) {
-        // Error is handled in the AuthContext
-      }
+    try {
+      await login(loginId, password);
+      router.replace('/(tabs)/');
+    } catch (error) {
+      // Error is handled in AuthContext
     }
   };
-  
+
   return (
-    <GradientBackground>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <View style={styles.logoContainer}>
-            <Logo showText={true} size="large" />
-          </View>
-          
-          <View style={styles.formContainer}>
-            <Text style={styles.welcomeText}>Welcome!</Text>
-            
-            <FormInput
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                setErrors((prev) => ({ ...prev, email: undefined }));
-              }}
-              error={errors.email}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              containerStyle={styles.inputContainer}
-            />
-            
-            <FormInput
-              label="Password"
-              placeholder="Enter your Password"
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                setErrors((prev) => ({ ...prev, password: undefined }));
-              }}
-              secureTextEntry
-              error={errors.password}
-              containerStyle={styles.inputContainer}
-            />
-            
-            <TouchableWithoutFeedback onPress={() => router.push('/forgot-password')}>
-              <Text style={styles.forgotPassword}>Forgot Password?</Text>
-            </TouchableWithoutFeedback>
-            
-            <Button 
-              title="Login" 
-              onPress={handleLogin} 
-              style={styles.loginButton}
-              loading={isLoading}
-              disabled={isLoading}
-            />
-            
-            <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
-              <TouchableWithoutFeedback onPress={() => router.push('/signup')}>
-                <Text style={styles.signupLink}>Sign Up</Text>
-              </TouchableWithoutFeedback>
-            </View>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </GradientBackground>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome!</Text>
+      
+      <View style={styles.form}>
+        <Text style={styles.label}>Login ID:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your Login ID"
+          value={loginId}
+          onChangeText={setLoginId}
+          autoCapitalize="none"
+        />
+
+        <Text style={styles.label}>Password:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity 
+          onPress={() => router.push('/forgot-password')}
+          style={styles.forgotPassword}
+        >
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.button, isLoading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#fff',
     padding: 20,
+    justifyContent: 'flex-start',
   },
-  logoContainer: {
-    alignItems: 'center',
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginTop: Platform.OS === 'ios' ? 60 : 40,
     marginBottom: 40,
   },
-  formContainer: {
+  form: {
     width: '100%',
-    maxWidth: 400,
   },
-  welcomeText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 8,
   },
-  inputContainer: {
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#F3F3F3',
+    borderRadius: 25,
+    paddingHorizontal: 20,
     marginBottom: 20,
+    fontSize: 16,
   },
   forgotPassword: {
-    textAlign: 'right',
-    marginTop: -10,
-    marginBottom: 20,
-    color: '#2E3192',
-    fontWeight: '500',
+    alignSelf: 'flex-end',
+    marginBottom: 30,
   },
-  loginButton: {
-    marginTop: 20,
+  forgotPasswordText: {
+    color: '#007AFF',
+    fontSize: 14,
   },
-  signupContainer: {
-    flexDirection: 'row',
+  button: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#8CC63F',
+    borderRadius: 25,
     justifyContent: 'center',
-    marginTop: 20,
+    alignItems: 'center',
   },
-  signupText: {
-    fontSize: 14,
+  buttonDisabled: {
+    opacity: 0.7,
   },
-  signupLink: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#2E3192',
+  buttonText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

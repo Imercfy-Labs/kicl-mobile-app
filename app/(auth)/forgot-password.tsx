@@ -1,121 +1,110 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import GradientBackground from '@/components/GradientBackground';
-import FormInput from '@/components/FormInput';
-import Button from '@/components/Button';
+import { ArrowLeft } from 'lucide-react-native';
 
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-export default function ForgotPasswordScreen() {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
+export default function CreatePasswordScreen() {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const router = useRouter();
-  
-  const validate = () => {
-    Keyboard.dismiss();
-    let isValid = true;
-    
-    if (!email.trim()) {
-      setError('Email is required');
-      isValid = false;
-    } else if (!EMAIL_REGEX.test(email)) {
-      setError('Please enter a valid email address');
-      isValid = false;
-    } else {
-      setError(null);
-    }
-    
-    return isValid;
+
+  const handleContinue = () => {
+    router.push('/otp-verification');
   };
-  
-  const handleResetPassword = async () => {
-    if (validate()) {
-      setIsLoading(true);
-      
-      // Simulate API call
-      setTimeout(() => {
-        setIsLoading(false);
-        Alert.alert(
-          'Reset Email Sent',
-          `We've sent password reset instructions to ${email}`,
-          [{ text: 'OK', onPress: () => router.back() }]
-        );
-      }, 1500);
-    }
-  };
-  
+
   return (
-    <GradientBackground>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Forgot Password</Text>
-          <Text style={styles.subtitle}>
-            Enter your email address and we'll send you instructions to reset your password.
-          </Text>
-          
-          <FormInput
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setError(null);
-            }}
-            error={error || undefined}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            containerStyle={styles.inputContainer}
-          />
-          
-          <Button 
-            title="Reset Password" 
-            onPress={handleResetPassword} 
-            style={styles.resetButton}
-            loading={isLoading}
-            disabled={isLoading}
-          />
-          
-          <TouchableWithoutFeedback onPress={() => router.back()}>
-            <Text style={styles.backToLogin}>Back to Login</Text>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
-    </GradientBackground>
+    <View style={styles.container}>
+      <TouchableOpacity 
+        onPress={() => router.back()} 
+        style={styles.backButton}
+      >
+        <ArrowLeft size={24} color="#000" />
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Create Password</Text>
+      <Text style={styles.subtitle}>
+        Your new password must be unique from those previously used.
+      </Text>
+
+      <View style={styles.form}>
+        <Text style={styles.label}>New Password:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter New Password"
+          value={newPassword}
+          onChangeText={setNewPassword}
+          secureTextEntry
+        />
+
+        <Text style={styles.label}>Confirm Password:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Your New Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={handleContinue}
+        >
+          <Text style={styles.buttonText}>Continue</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
     padding: 20,
   },
+  backButton: {
+    marginTop: Platform.OS === 'ios' ? 40 : 20,
+    marginBottom: 20,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
+    marginBottom: 12,
   },
   subtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 40,
+  },
+  form: {
+    width: '100%',
+  },
+  label: {
     fontSize: 16,
-    color: '#555',
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  resetButton: {
-    marginTop: 16,
-  },
-  backToLogin: {
-    marginTop: 24,
-    textAlign: 'center',
-    color: '#2E3192',
     fontWeight: '500',
+    marginBottom: 8,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#F3F3F3',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    marginBottom: 20,
     fontSize: 16,
+  },
+  button: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#8CC63F',
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
