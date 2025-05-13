@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LogOut } from 'lucide-react-native';
 
@@ -31,6 +31,7 @@ export default function SideMenu({ activePath, userInfo, onClose }: SideMenuProp
       ]}>
         {title}
       </Text>
+      {isActive && <View style={styles.activeIndicator} />}
     </TouchableOpacity>
   );
 
@@ -54,88 +55,51 @@ export default function SideMenu({ activePath, userInfo, onClose }: SideMenuProp
         <Text style={styles.employeeId}>Employee ID: {userInfo.employeeId}</Text>
       </View>
 
-      <View style={styles.menuContainer}>
+      <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
         <MenuItem 
           title="Dashboard" 
           isActive={activePath === '/dashboard'}
-          onPress={() => router.push('/dashboard')}
+          onPress={() => {
+            router.push('/dashboard');
+            onClose();
+          }}
         />
         <MenuItem 
           title="Dealers" 
           isActive={activePath === '/dealers'}
-          onPress={() => router.push('/dealers')}
+          onPress={() => {
+            router.push('/dealers');
+            onClose();
+          }}
         />
         {activePath === '/dealers' && (
           <>
-            <MenuItem 
-              title="Dealer Info" 
-              isSubItem 
-              isActive={activePath === '/dealers/info'}
-              onPress={() => router.push('/dealers/info')}
-            />
-            <MenuItem 
-              title="Payment" 
-              isSubItem
-              onPress={() => router.push('/dealers/payment')}
-            />
-            <MenuItem 
-              title="Dealer Outstanding" 
-              isSubItem
-              onPress={() => router.push('/dealers/outstanding')}
-            />
-            <MenuItem 
-              title="Dealer History" 
-              isSubItem
-              onPress={() => router.push('/dealers/history')}
-            />
-            <MenuItem 
-              title="Credit Note" 
-              isSubItem
-              onPress={() => router.push('/dealers/credit-note')}
-            />
+            <MenuItem title="Dealer Info" isSubItem isActive />
+            <MenuItem title="Payment" isSubItem />
+            <MenuItem title="Dealer Outstanding" isSubItem />
+            <MenuItem title="Dealer History" isSubItem />
+            <MenuItem title="Credit Note" isSubItem />
           </>
         )}
         <MenuItem 
           title="Orders" 
           isActive={activePath.includes('/orders')}
-          onPress={() => router.push('/orders')}
+          onPress={() => {
+            router.push('/orders');
+            onClose();
+          }}
         />
         {activePath.includes('/orders') && (
           <>
-            <MenuItem 
-              title="Place Order" 
-              isSubItem 
-              isActive={activePath === '/orders/place'}
-              onPress={() => router.push('/orders/place')}
-            />
-            <MenuItem 
-              title="My Orders" 
-              isSubItem
-              onPress={() => router.push('/orders/my-orders')}
-            />
-            <MenuItem 
-              title="Track Order" 
-              isSubItem
-              onPress={() => router.push('/orders/track')}
-            />
+            <MenuItem title="Place Order" isSubItem isActive />
+            <MenuItem title="My Orders" isSubItem />
+            <MenuItem title="Track Order" isSubItem />
           </>
         )}
-        <MenuItem 
-          title="Inventory" 
-          isActive={activePath === '/inventory'}
-          onPress={() => router.push('/inventory')}
-        />
-        <MenuItem 
-          title="Field Development" 
-          isActive={activePath === '/field-development'}
-          onPress={() => router.push('/field-development')}
-        />
-        <MenuItem 
-          title="Settlement" 
-          isActive={activePath === '/settlement'}
-          onPress={() => router.push('/settlement')}
-        />
-      </View>
+        <MenuItem title="Inventory" />
+        <MenuItem title="Field Development" />
+        <MenuItem title="Settlement" />
+      </ScrollView>
 
       <TouchableOpacity 
         style={styles.logoutButton}
@@ -207,12 +171,23 @@ const styles = StyleSheet.create({
   menuItem: {
     paddingVertical: 12,
     paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   activeMenuItem: {
     backgroundColor: '#3DD39E',
   },
+  activeIndicator: {
+    width: 4,
+    height: '100%',
+    backgroundColor: '#fff',
+    position: 'absolute',
+    right: 0,
+  },
   subMenuItem: {
     paddingLeft: 40,
+    backgroundColor: 'rgba(61, 211, 158, 0.1)',
   },
   menuText: {
     fontSize: 16,
