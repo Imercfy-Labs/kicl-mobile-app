@@ -8,19 +8,20 @@ import { DrawerContext } from './_layout';
 export default function DashboardScreen() {
   const { user } = useAuth();
   const [isPunchedIn, setIsPunchedIn] = useState(false);
-  const [lastInTime, setLastInTime] = useState<string | null>(null);
-  const [lastOutTime, setLastOutTime] = useState<string | null>(null);
+const [lastInTime, setLastInTime] = useState<string | null>(null);
+const [lastOutTime, setLastOutTime] = useState<string | null>(null);
   const { toggleDrawer } = React.useContext(DrawerContext);
 
-  const getCurrentTime = () => {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = hours % 12 || 12;
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    return `${formattedHours}:${formattedMinutes} ${ampm}`;
-  };
+const getCurrentTime = () => {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+  return `${formattedHours}:${formattedMinutes} ${ampm}`;
+};
+
 
   const togglePunchStatus = () => {
     const currentTime = getCurrentTime();
