@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://devkicl.duckdns.org/api/login';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://devkicl.duckdns.org';
 
 interface ApiResponse<T> {
   data?: T;
