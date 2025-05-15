@@ -8,27 +8,27 @@ import { DrawerContext } from './_layout';
 export default function DashboardScreen() {
   const { user } = useAuth();
   const [isPunchedIn, setIsPunchedIn] = useState(false);
-const [lastInTime, setLastInTime] = useState<string | null>(null);
-const [lastOutTime, setLastOutTime] = useState<string | null>(null);
+  const [lastInTime, setLastInTime] = useState('--:--');
+  const [lastOutTime, setLastOutTime] = useState('--:--');
   const { toggleDrawer } = React.useContext(DrawerContext);
 
-const getCurrentTime = () => {
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const formattedHours = hours % 12 || 12;
-  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-  return `${formattedHours}:${formattedMinutes} ${ampm}`;
-};
-
+  const getCurrentTime = () => {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    return `${hours}:${formattedMinutes} ${ampm}`;
+  };
 
   const togglePunchStatus = () => {
     const currentTime = getCurrentTime();
-    if (!isPunchedIn) {
-      setLastInTime(currentTime);
-    } else {
+    if (isPunchedIn) {
       setLastOutTime(currentTime);
+    } else {
+      setLastInTime(currentTime);
     }
     setIsPunchedIn(!isPunchedIn);
   };
@@ -68,12 +68,8 @@ const getCurrentTime = () => {
         </TouchableOpacity>
 
         <View style={styles.timeInfo}>
-          <Text style={styles.timeText}>
-            Last In Time: {lastInTime || '--:--'}
-          </Text>
-          <Text style={styles.timeText}>
-            Last Out Time: {lastOutTime || '--:--'}
-          </Text>
+          <Text style={styles.timeText}>Last In Time: {lastInTime}</Text>
+          <Text style={styles.timeText}>Last Out Time: {lastOutTime}</Text>
         </View>
 
         <Text style={styles.sectionTitle}>My Progress:</Text>
