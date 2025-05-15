@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LogOut } from 'lucide-react-native';
+import { LogOut, ChevronRight } from 'lucide-react-native';
 
 interface SideMenuProps {
   activePath: string;
@@ -31,6 +31,7 @@ export default function SideMenu({ activePath, userInfo, onClose }: SideMenuProp
       ]}>
         {title}
       </Text>
+      {!isSubItem && <ChevronRight size={20} color={isActive ? "#fff" : "#666"} />}
       {isActive && <View style={styles.activeIndicator} />}
     </TouchableOpacity>
   );
@@ -47,10 +48,9 @@ export default function SideMenu({ activePath, userInfo, onClose }: SideMenuProp
       </View>
 
       <View style={styles.userInfo}>
-        <Image
-          source={{ uri: 'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg' }}
-          style={styles.userAvatar}
-        />
+        <View style={styles.userAvatar}>
+          <Text style={styles.userInitial}>{userInfo.name[0]}</Text>
+        </View>
         <Text style={styles.userName}>{userInfo.name}</Text>
         <Text style={styles.employeeId}>Employee ID: {userInfo.employeeId}</Text>
       </View>
@@ -153,7 +153,15 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
+    backgroundColor: '#2E3192',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
+  },
+  userInitial: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: '600',
   },
   userName: {
     fontSize: 16,
