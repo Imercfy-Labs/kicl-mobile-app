@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://api.example.com';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://devkicl.duckdns.org/api/login';
 
 interface ApiResponse<T> {
   data?: T;
@@ -21,7 +21,7 @@ async function handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
 
 export async function login(loginId: string, password: string) {
   try {
-    const response = await fetch(`${API_URL}/auth/login`, {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ export async function login(loginId: string, password: string) {
 
 export async function resetPassword(email: string) {
   try {
-    const response = await fetch(`${API_URL}/auth/reset-password`, {
+    const response = await fetch(`${API_URL}/reset-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ export async function resetPassword(email: string) {
 
 export async function verifyOTP(email: string, otp: string) {
   try {
-    const response = await fetch(`${API_URL}/auth/verify-otp`, {
+    const response = await fetch(`${API_URL}/verify-otp`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

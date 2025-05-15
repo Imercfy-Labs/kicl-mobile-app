@@ -31,7 +31,7 @@ export default {
     favicon: './assets/favicon.png'
   },
   extra: {
-    apiUrl: process.env.EXPO_PUBLIC_API_URL || 'https://api.example.com',
+    apiUrl: process.env.EXPO_PUBLIC_API_URL
   },
   plugins: [
     'expo-secure-store'
