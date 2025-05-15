@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
-import { Menu, Bell, User } from 'lucide-react-native';
+import { Menu, Bell, User, Clock } from 'lucide-react-native';
 import Logo from '@/components/Logo';
 import { DrawerContext } from './_layout';
+
+interface TimeRecord {
+  date: string;
+  punchIn: string;
+  punchOut: string;
+  totalHours: string;
+}
 
 export default function DashboardScreen() {
   const { user } = useAuth();
   const [isPunchedIn, setIsPunchedIn] = useState(false);
-  const [lastInTime, setLastInTime] = useState('--:--');
-  const [lastOutTime, setLastOutTime] = useState('--:--');
+  const [currentDate, setCurrentDate] = useState('');
+  const [punchInTime, setPunchInTime] = useState('');
+  const [punchOutTime, setPunchOutTime] = useState('');
+  const [totalHours, setTotalHours] = useState('0:00');
   const { toggleDrawer } = React.useContext(DrawerContext);
+
+  useEffect(() => {
+    const today = new Date();
+    setCurrentDate(today.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+  }, []);
 
   const getCurrentTime = () => {
     const now = new Date();
@@ -18,18 +37,43 @@ export default function DashboardScreen() {
     const minutes = now.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12; // Convert 0 to 12
+    hours = hours ? hours : 12;
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     return `${hours}:${formattedMinutes} ${ampm}`;
   };
 
+  const calculateTotalHours = (inTime: string, outTime: string) => {
+    if (!inTime || !outTime) return '0:00';
+
+    const convertTimeToMinutes = (time: string) => {
+      const [timeStr, period] = time.split(' ');
+      let [hours, minutes] = timeStr.split(':').map(Number);
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      return hours * 60 + minutes;
+    };
+
+    const inMinutes = convertTimeToMinutes(inTime);
+    const outMinutes = convertTimeToMinutes(outTime);
+    const diffMinutes = outMinutes - inMinutes;
+
+    const hours = Math.floor(diffMinutes / 60);
+    const minutes = diffMinutes % 60;
+    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+  };
+
   const togglePunchStatus = () => {
     const currentTime = getCurrentTime();
+    
     if (isPunchedIn) {
-      setLastOutTime(currentTime);
+      setPunchOutTime(currentTime);
+      setTotalHours(calculateTotalHours(punchInTime, currentTime));
     } else {
-      setLastInTime(currentTime);
+      setPunchInTime(currentTime);
+      setPunchOutTime('');
+      setTotalHours('0:00');
     }
+    
     setIsPunchedIn(!isPunchedIn);
   };
 
@@ -58,18 +102,39 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.content}>
-        <TouchableOpacity 
-          style={[styles.punchButton, isPunchedIn ? styles.punchOutButton : styles.punchInButton]}
-          onPress={togglePunchStatus}
-        >
-          <Text style={styles.punchButtonText}>
-            {isPunchedIn ? 'Punch Out' : 'Punch In'}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.timeTrackingCard}>
+          <Text style={styles.dateText}>{currentDate}</Text>
+          
+          <View style={styles.timeStatusContainer}>
+            <Clock size={24} color="#666" style={styles.clockIcon} />
+            <Text style={styles.timeStatusText}>
+              {!punchInTime ? 'No Time Record' : isPunchedIn ? 'Currently Working' : 'Shift Complete'}
+            </Text>
+          </View>
 
-        <View style={styles.timeInfo}>
-          <Text style={styles.timeText}>Last In Time: {lastInTime}</Text>
-          <Text style={styles.timeText}>Last Out Time: {lastOutTime}</Text>
+          <View style={styles.timeDetails}>
+            <View style={styles.timeColumn}>
+              <Text style={styles.timeLabel}>Punch In</Text>
+              <Text style={styles.timeValue}>{punchInTime || '--:--'}</Text>
+            </View>
+            <View style={styles.timeColumn}>
+              <Text style={styles.timeLabel}>Punch Out</Text>
+              <Text style={styles.timeValue}>{punchOutTime || '--:--'}</Text>
+            </View>
+            <View style={styles.timeColumn}>
+              <Text style={styles.timeLabel}>Total Hours</Text>
+              <Text style={styles.timeValue}>{totalHours}</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.punchButton, isPunchedIn ? styles.punchOutButton : styles.punchInButton]}
+            onPress={togglePunchStatus}
+          >
+            <Text style={styles.punchButtonText}>
+              {isPunchedIn ? 'Punch Out' : 'Punch In'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.sectionTitle}>My Progress:</Text>
@@ -97,7 +162,7 @@ export default function DashboardScreen() {
           />
           <ProgressCard 
             title="Hours Worked Today" 
-            value="5"
+            value={totalHours}
           />
         </View>
       </View>
@@ -130,14 +195,66 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  timeTrackingCard: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dateText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 15,
+  },
+  timeStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  clockIcon: {
+    marginRight: 10,
+  },
+  timeStatusText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  timeDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    paddingVertical: 15,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  timeColumn: {
+    alignItems: 'center',
+  },
+  timeLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 5,
+  },
+  timeValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
   punchButton: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    marginVertical: 20,
   },
   punchInButton: {
     backgroundColor: '#8CC63F',
@@ -147,17 +264,8 @@ const styles = StyleSheet.create({
   },
   punchButtonText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: '600',
-  },
-  timeInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
-  timeText: {
-    color: '#666',
-    fontSize: 14,
   },
   sectionTitle: {
     fontSize: 18,
