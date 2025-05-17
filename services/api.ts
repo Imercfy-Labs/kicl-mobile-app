@@ -39,8 +39,8 @@ export async function login(loginId: string, password: string): Promise<ApiRespo
       body: JSON.stringify({ loginId, password }),
     });
 
-    return handleResponse<LoginResponse>(response);
-  } catch (error) {
+    return await handleResponse<LoginResponse>(response);
+  } catch (error: any) {
     return { error: error.message };
   }
 }
@@ -55,8 +55,8 @@ export async function resetPassword(email: string): Promise<ApiResponse<{ messag
       body: JSON.stringify({ email }),
     });
 
-    return handleResponse<{ message: string }>(response);
-  } catch (error) {
+    return await handleResponse<{ message: string }>(response);
+  } catch (error: any) {
     return { error: error.message };
   }
 }
@@ -71,8 +71,8 @@ export async function verifyOTP(email: string, otp: string): Promise<ApiResponse
       body: JSON.stringify({ email, otp }),
     });
 
-    return handleResponse<{ message: string }>(response);
-  } catch (error) {
+    return await handleResponse<{ message: string }>(response);
+  } catch (error: any) {
     return { error: error.message };
   }
 }
