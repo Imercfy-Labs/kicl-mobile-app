@@ -15,6 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (loginId: string, password: string) => Promise<void>;
   logout: () => void;
+  signup?: (data: { name: string; email: string; password: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -32,7 +33,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check for stored session on app load
   useEffect(() => {
     const loadStoredUser = async () => {
       try {
@@ -62,13 +62,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.data) {
         const { token, user } = response.data;
         
-        // Store user data and token securely
         await secureStore.setItem('token', token);
         await secureStore.setItem('user', JSON.stringify(user));
         
         setUser(user);
       }
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Login Failed', error.message || 'Invalid credentials');
       throw error;
     } finally {
