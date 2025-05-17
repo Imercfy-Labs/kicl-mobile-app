@@ -7,6 +7,16 @@ interface ApiResponse<T> {
   error?: string;
 }
 
+interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    employeeId: string;
+    email: string;
+  };
+}
+
 async function handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
   const contentType = response.headers.get('content-type');
   const isJson = contentType?.includes('application/json');
@@ -19,9 +29,9 @@ async function handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
   return { data: data as T };
 }
 
-export async function login(loginId: string, password: string) {
+export async function login(loginId: string, password: string): Promise<ApiResponse<LoginResponse>> {
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,21 +39,13 @@ export async function login(loginId: string, password: string) {
       body: JSON.stringify({ loginId, password }),
     });
 
-    return handleResponse<{
-      token: string;
-      user: {
-        id: string;
-        name: string;
-        employeeId: string;
-        email: string;
-      };
-    }>(response);
+    return handleResponse<LoginResponse>(response);
   } catch (error) {
     return { error: error.message };
   }
 }
 
-export async function resetPassword(email: string) {
+export async function resetPassword(email: string): Promise<ApiResponse<{ message: string }>> {
   try {
     const response = await fetch(`${API_URL}/reset-password`, {
       method: 'POST',
@@ -59,7 +61,7 @@ export async function resetPassword(email: string) {
   }
 }
 
-export async function verifyOTP(email: string, otp: string) {
+export async function verifyOTP(email: string, otp: string): Promise<ApiResponse<{ message: string }>> {
   try {
     const response = await fetch(`${API_URL}/verify-otp`, {
       method: 'POST',
